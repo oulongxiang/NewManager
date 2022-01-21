@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <springProperty scope="context" name="LOG_PATH" source="logback.file"/>
+    <!--定义日志存放的位置-->
+    <springProperty scope="context" name="integratingLogPath" source="logging.path"
+                    defaultValue=".logs"/>
+
+    <!--从springboot的application.yml配置文件中读取配置-->
+    <springProperty scope="context" name="datasource.driverClass"
+                    source="spring.datasource.dynamic.datasource.admin.driver-class-name"/>
+    <springProperty scope="context" name="datasource.url" source="spring.datasource.dynamic.datasource.admin.url"/>
+    <springProperty scope="context" name="datasource.user"
+                    source="spring.datasource.dynamic.datasource.admin.username"/>
+    <springProperty scope="context" name="datasource.password"
+                    source="spring.datasource.dynamic.datasource.admin.password"/>
+
+    <!--连接数据库配置-->
+    <appender name="db_classic_sqlserver_pool" class="com.tul.manage.config.LogDbAppender">
+        <connectionSource class="ch.qos.logback.core.db.DataSourceConnectionSource">
+            <dataSource class="com.alibaba.druid.pool.DruidDataSource">
+                <driverClassName>${datasource.driverClass}</driverClassName>
+                <url>${datasource.url}</url>
+                <username>${datasource.user}</username>
+                <password>${datasource.password}</password>
+            </dataSource>
+        </connectionSource>
+        <!-- 只记录error级别的 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+
+    <!-- ConsoleAppender 控制台输出日志 -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>【%level】 %d{yyyy-MM-dd HH:mm:ss} Line:%-3L %logger - %msg%n</pattern>
+            <charset>utf-8</charset>
+        </encoder>
+        <!-- 打印INFO级别以上的日志到控制台 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+    </appender>
+
+    <!-- 日志记录器，日期滚动记录 -->
+    <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 归档的日志文件的路径，例如今天是2013-12-21日志，当前写的日志文件路径为file节点指定，可以将此文件与file指定文件路径设置为不同路径，从而将当前日志文件或归档日志文件置不同的目录。
+                    而2013-12-21的日志文件在由fileNamePattern指定。%d{yyyy-MM-dd}指定日期格式，%i指定索引 -->
+            <fileNamePattern>${integratingLogPath}/error/【ERROR】-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 除按日志记录之外，还配置了日志文件不能超过2M，若超过2M，日志文件会以索引0开始，
+                   命名日志文件，例如log-error-2013-12-21.0.log -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <!-- 追加方式记录日志 -->
+        <append>true</append>
+        <!-- 日志文件的格式 -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger Line:%-3L - %msg%n</pattern>
+            <charset>utf-8</charset>
+        </encoder>
+        <!-- 此日志文件只记录error级别的 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- 日志记录器，日期滚动记录 -->
+    <appender name="FILE_ALL" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 归档的日志文件的路径，例如今天是2013-12-21日志，当前写的日志文件路径为file节点指定，可以将此文件与file指定文件路径设置为不同路径，从而将当前日志文件或归档日志文件置不同的目录。
+                   而2013-12-21的日志文件在由fileNamePattern指定。%d{yyyy-MM-dd}指定日期格式，%i指定索引 -->
+            <fileNamePattern>${integratingLogPath}/total/【TOTAL】-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 除按日志记录之外，还配置了日志文件不能超过2M，若超过2M，日志文件会以索引0开始，
+                命名日志文件，例如log-error-2013-12-21.0.log -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>200MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <!-- 追加方式记录日志 -->
+        <append>true</append>
+        <!-- 日志文件的格式 -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger Line:%-3L - %msg%n</pattern>
+            <charset>utf-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+    <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+    <!-- 添加附加的appender,最多只能添加一个 -->
+    <appender name="FILE_ASYNC_ALL" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>256</queueSize>
+        <includeCallerData>true</includeCallerData>
+        <appender-ref ref="FILE_ALL"/>
+    </appender>
+
+
+    <!-- WARN级别日志 appender -->
+    <appender name="WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 过滤器，只记录WARN级别的日志 -->
+        <!-- 果日志级别等于配置级别，过滤器会根据onMath 和 onMismatch接收或拒绝日志。 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- 设置过滤级别 -->
+            <level>WARN</level>
+            <!-- 用于配置符合过滤条件的操作 -->
+            <onMatch>ACCEPT</onMatch>
+            <!-- 用于配置不符合过滤条件的操作 -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日志输出位置 可相对、和绝对路径 -->
+            <fileNamePattern>${integratingLogPath}/warn/【WARN】-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>${maxHistory}</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger Line:%-3L - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- INFO级别日志 appender -->
+    <appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${integratingLogPath}/info/【INFO】-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>1MB</maxFileSize>
+            <maxHistory>${maxHistory}</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger Line:%-3L - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- DEBUG级别日志 appender -->
+    <appender name="DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${integratingLogPath}/debug/【DEBUG】-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>5MB</maxFileSize>
+            <maxHistory>${maxHistory}</maxHistory>
+        </rollingPolicy>
+        <!--        dubug日志不输出控制台-->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger Line:%-3L - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <!--    <logger name="org.springframework.web" level="INFO" additivity="false">-->
+    <!--        <appender-ref ref="console"/>-->
+    <!--    </logger>-->
+    <!-- 根 logger -->
+    <root level="DEBUG">
+        <!-- 控制台输出 -->
+        <appender-ref ref="console"/>
+        <!-- 文件输出 -->
+        <!--        <appender-ref ref="STDOUT"/>-->
+        <appender-ref ref="ERROR"/>
+        <appender-ref ref="INFO"/>
+        <appender-ref ref="WARN"/>
+        <appender-ref ref="DEBUG"/>
+        <appender-ref ref="FILE_ASYNC_ALL"/>
+        <appender-ref ref="db_classic_sqlserver_pool"/>
+    </root>
+
+    <!-- 通过 LoggerFactory.getLogger("") 可以获取到这个logger
+                        由于这个logger自动继承了root的appender，root中已经有stdout的appender了，
+                        这边又引入了stdout的appender， additivity表示要不要使用rootLogger配置的appender进行输出
+          如果没有设置 additivity="false" ,就会导致一条日志在控制台输出两次的情况 -->
+    <!--    <logger name="com.see" level="info,error" additivity="false">-->
+    <!--        <appender-ref ref="STDOUT"/>-->
+    <!--        <appender-ref ref="FILE_ASYNC_ALL"/>-->
+    <!--        <appender-ref ref="FILE_ASYNC_ERROR"/>-->
+    <!--    </logger>-->
+
+    <!--对于类路径以 com.integrating.logback 开头的Logger,输出级别设置为debug,并且只输出到控制台-->
+    <!--    <logger name="org.springframework.web.client" level="debug"/>-->
+
+    <!--    </springProfile>-->
+
+    <!-- ****************************************************************************************** -->
+    <!-- ********************** 放到服务器上不管在什么环境都只在文件记录日志 **************************** -->
+    <!-- ****************************************************************************************** -->
+    <!--    <springProfile name="!local">-->
+    <!--        &lt;!&ndash; 加上控制台打印日志 &ndash;&gt;-->
+    <!--        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">-->
+    <!--            &lt;!&ndash;encoder 默认配置为PatternLayoutEncoder&ndash;&gt;-->
+    <!--            <encoder>-->
+    <!--                <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger Line:%-3L - %msg%n</pattern>-->
+    <!--                <charset>utf-8</charset>-->
+    <!--            </encoder>-->
+    <!--        </appender>-->
+
+    <!--        &lt;!&ndash; <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" /> &ndash;&gt;-->
+
+    <!--        &lt;!&ndash; 本地还是记录一下日志文件 &ndash;&gt;-->
+    <!--        &lt;!&ndash; 日志记录器，日期滚动记录 &ndash;&gt;-->
+    <!--        <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+    <!--            &lt;!&ndash; 正在记录的日志文件的路径及文件名 &ndash;&gt;-->
+    <!--            <file>${integratingLogPath}/log_error.log</file>-->
+    <!--            &lt;!&ndash; 日志记录器的滚动策略，按日期，按大小记录 &ndash;&gt;-->
+    <!--            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+    <!--                &lt;!&ndash; 归档的日志文件的路径，例如今天是2013-12-21日志，当前写的日志文件路径为file节点指定，可以将此文件与file指定文件路径设置为不同路径，从而将当前日志文件或归档日志文件置不同的目录。-->
+    <!--               		 而2013-12-21的日志文件在由fileNamePattern指定。%d{yyyy-MM-dd}指定日期格式，%i指定索引 &ndash;&gt;-->
+    <!--                <fileNamePattern>${integratingLogPath}/error/log-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>-->
+    <!--                &lt;!&ndash; 除按日志记录之外，还配置了日志文件不能超过2M，若超过2M，日志文件会以索引0开始，-->
+    <!--              		 命名日志文件，例如log-error-2013-12-21.0.log &ndash;&gt;-->
+    <!--                <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">-->
+    <!--                    <maxFileSize>100MB</maxFileSize>-->
+    <!--                </timeBasedFileNamingAndTriggeringPolicy>-->
+    <!--                &lt;!&ndash; 日志文档保留天数 &ndash;&gt;-->
+    <!--                <maxHistory>30</maxHistory>-->
+    <!--            </rollingPolicy>-->
+    <!--            &lt;!&ndash; 追加方式记录日志 &ndash;&gt;-->
+    <!--            <append>true</append>-->
+    <!--            &lt;!&ndash; 日志文件的格式 &ndash;&gt;-->
+    <!--            <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">-->
+    <!--                <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger Line:%-3L - %msg%n</pattern>-->
+    <!--                <charset>utf-8</charset>-->
+    <!--            </encoder>-->
+    <!--            &lt;!&ndash; 此日志文件只记录error级别的 &ndash;&gt;-->
+    <!--            <filter class="ch.qos.logback.classic.filter.LevelFilter">-->
+    <!--                <level>ERROR</level>-->
+    <!--                <onMatch>ACCEPT</onMatch>-->
+    <!--                <onMismatch>DENY</onMismatch>-->
+    <!--            </filter>-->
+    <!--        </appender>-->
+
+
+    <!--        &lt;!&ndash; 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 &ndash;&gt;-->
+    <!--        &lt;!&ndash; 更改默认的队列的深度,该值会影响性能.默认值为256 &ndash;&gt;-->
+    <!--        &lt;!&ndash; 添加附加的appender,最多只能添加一个 &ndash;&gt;-->
+    <!--        &lt;!&ndash; <appender name="FILE_ASYNC_ALL" class="ch.qos.logback.classic.AsyncAppender">-->
+    <!--            <discardingThreshold>0</discardingThreshold>-->
+    <!--            <queueSize>256</queueSize>-->
+    <!--            <includeCallerData>true</includeCallerData>-->
+    <!--            <appender-ref ref="FILE_ALL" />-->
+    <!--        </appender> &ndash;&gt;-->
+
+    <!--        　　&lt;!&ndash; 使用异步来记录错误信息&ndash;&gt;-->
+    <!--        <appender name="FILE_ASYNC_ERROR" class="ch.qos.logback.classic.AsyncAppender">-->
+    <!--            <discardingThreshold>0</discardingThreshold>-->
+    <!--            <queueSize>256</queueSize>-->
+    <!--            <includeCallerData>true</includeCallerData>-->
+    <!--            <appender-ref ref="FILE_ERROR" />-->
+    <!--        </appender>-->
+
+    <!--        &lt;!&ndash; 根 logger &ndash;&gt;-->
+    <!--        <root level="info">-->
+    <!--            <appender-ref ref="STDOUT"/>-->
+    <!--            &lt;!&ndash; <appender-ref ref="FILE_ASYNC_ALL"/> &ndash;&gt;-->
+    <!--            <appender-ref ref="FILE_ASYNC_ERROR"/>-->
+    <!--        </root>-->
+
+    <!--        &lt;!&ndash; 通过 LoggerFactory.getLogger("") 可以获取到这个logger-->
+    <!--                            由于这个logger自动继承了root的appender，root中已经有stdout的appender了，-->
+    <!--                            这边又引入了stdout的appender， additivity表示要不要使用rootLogger配置的appender进行输出-->
+    <!--              如果没有设置 additivity="false" ,就会导致一条日志在控制台输出两次的情况 &ndash;&gt;-->
+    <!--        <logger name="com.see" level="info,error" additivity="false">-->
+    <!--            <appender-ref ref="STDOUT"/>-->
+    <!--            &lt;!&ndash; <appender-ref ref="FILE_ASYNC_ALL"/> &ndash;&gt;-->
+    <!--            <appender-ref ref="FILE_ASYNC_ERROR"/>-->
+    <!--        </logger>-->
+
+    <!--        &lt;!&ndash;对于类路径以 com.integrating.logback 开头的Logger,输出级别设置为debug,并且只输出到控制台&ndash;&gt;-->
+    <!--        <logger name="org.springframework.web.client" level="debug"/>-->
+
+    <!--    </springProfile>-->
+
+</configuration>

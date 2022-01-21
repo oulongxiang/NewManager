@@ -1,0 +1,72 @@
+#set($excludeColumns = ["excludeColumns"])
+package ${package}.${moduleName}.entity;
+
+import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import java.io.Serializable;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+#if(${hasBigDecimal})
+import java.math.BigDecimal;
+#end
+#if(${isImportLocalDateTime})
+import java.time.LocalDateTime;
+#end
+
+/**
+ * ${comments}
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Data
+@TableName("${tableName}")
+@EqualsAndHashCode(callSuper = false)
+@ApiModel(value = "${comments}")
+public class ${className} extends Model<${className}> {
+
+    private static final long serialVersionUID=1L;
+
+#foreach ($column in $columns)
+## 排除部分字段
+#if(!$excludeColumns.contains($column.columnName))
+    /**
+     * $column.comments
+     */
+#if($column.columnName == $pk.columnName && $column.isAuto)
+    @TableId(value = "$column.columnName", type = IdType.AUTO)
+#end
+#if($column.columnName == $pk.columnName && !$column.isAuto)
+    @TableId(value = "$column.columnName", type = IdType.ASSIGN_UUID)
+#end
+    @ApiModelProperty(value="$column.comments"#if($column.hidden),hidden=$column.hidden#end)
+## 逻辑删除
+#if($column.isLogicDelete)
+    @TableLogic
+#end
+## 创建时间 修改时间 逻辑删除
+#if($column.isCreateTime || $column.isLogicDelete || $column.isUpdateTime)
+    @TableField(value="$column.columnName",fill = FieldFill.INSERT)
+#else
+## 主键不需要此注解
+#if($column.columnName != $pk.columnName)
+    @TableField("$column.columnName")
+#end
+#end
+    private $column.attrType $column.lowerAttrName;
+
+#end
+#end
+
+    @Override
+    protected Serializable pkVal() {
+    #if(!$pk)
+        return null;
+    #else
+        return this.$pk.columnName;
+    #end
+    }
+
+}

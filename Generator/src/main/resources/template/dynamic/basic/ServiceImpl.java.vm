@@ -1,0 +1,23 @@
+package ${package}.${moduleName}.service.impl;
+
+import com.tul.manage.security.service.BaseServiceImpl;
+import ${package}.${moduleName}.entity.${className};
+import ${package}.${moduleName}.dao.${className}Dao;
+import ${package}.${moduleName}.service.I${className}Service;
+import org.springframework.stereotype.Service;
+#if($dataSourceName)
+import com.baomidou.dynamic.datasource.annotation.DS;
+#end
+/**
+ * ${comments}
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Service
+#if($dataSourceName)
+@DS("$dataSourceName")
+#end
+public class ${className}ServiceImpl extends BaseServiceImpl<${className}Dao, ${className}> implements I${className}Service {
+
+}

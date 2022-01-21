@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tul.manage.security.dao.SystemLogDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tul.manage.security.entity.SystemLog">
+        <id column="id" property="id" />
+        <result column="log_level" property="logLevel" />
+        <result column="operation_time" property="operationTime" />
+        <result column="operator_user_id" property="operatorUserId" />
+        <result column="content" property="content" />
+        <result column="caller_package_name" property="callerPackageName" />
+        <result column="caller_class_name" property="callerClassName" />
+        <result column="caller_method_name" property="callerMethodName" />
+        <result column="caller_line" property="callerLine" />
+        <result column="stack_trace" property="stackTrace"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, log_level, operation_time, operator_user_id, content, caller_package_name,
+        caller_class_name,
+        caller_method_name,
+        caller_line,stack_trace
+    </sql>
+    <delete id="taskDelSysLog">
+         delete system_log where CONVERT(varchar(100), operation_time, 23) = CONVERT(varchar(100),  DateAdd(Month,-3,GETDATE()), 23)
+    </delete>
+
+    <select id="getSystemLogList" resultType="com.tul.manage.security.vo.response.SystemLogVo">
+        SELECT u.user_name AS name,s.log_level AS
+        log_level,s.operator_user_id,s.content,s.caller_package_name,s.caller_method_name,s.caller_line AS
+        caller_line,s.operation_time,stack_trace FROM
+        system_log s left JOIN user_info u on s.operator_user_id = u.id
+        WHERE 1=1
+        <if test="operatorName != null and operatorName !=''">and u.user_name like CONCAT('%',#{operatorName},'%')</if>
+        <if test="beginDate != null and endDate !=null">and CONVERT(varchar(100), s.operation_time, 23) BETWEEN
+            #{beginDate} AND #{endDate}
+        </if>
+        <if test="errType==2" >
+          and  s.operator_user_id='task'
+        </if>
+        <if test="errType ==1 " >
+           and s.log_level = 'ERROR' and s.operator_user_id is not null and s.operator_user_id !='task'
+        </if>
+    </select>
+
+    <select id="getSqlOperationList" resultType="com.tul.manage.security.vo.response.SystemLogVo">
+        SELECT u.user_name AS name,s.log_level AS
+        log_level,s.operator_user_id,s.content,s.caller_package_name,s.operation_time,stack_trace FROM
+        system_log s JOIN user_info u on s.operator_user_id = u.id
+        WHERE 1=1
+        <if test="operatorName != null and operatorName !=''">and u.user_name like CONCAT('%',#{operatorName},'%')</if>
+        <if test="beginDate != null and endDate !=null">and CONVERT(varchar(100), s.operation_time, 23) BETWEEN
+            #{beginDate} AND #{endDate}
+        </if>
+        <if test="operatorType != null">and s.log_level = #{operatorType}</if>
+        <if test="operatorType == null">and s.log_level != 'ERROR'</if>
+
+    </select>
+
+</mapper>

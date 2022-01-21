@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.tul.audit</groupId>
+    <artifactId>AuditSystem</artifactId>
+    <packaging>pom</packaging>
+    <version>0.0.1</version>
+    <modules>
+
+        <module>BaseModel</module>
+        <module>CommonEntity</module>
+        <module>Common</module>
+        <module>Security</module>
+        <module>Generator</module>
+
+        <module>AuditPlan</module>
+    </modules>
+
+    <!--jar版本控制-->
+    <properties>
+        <!--java版本-->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <encoding>UTF-8</encoding>
+        <java.version>1.8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <!--spring-boot版本-->
+        <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
+        <!--spring-cloud版本-->
+        <spring-cloud.version>Hoxton.SR1</spring-cloud.version>
+        <!--spring-alibaba版本-->
+        <spring-alibaba.version>2.1.0.RELEASE</spring-alibaba.version>
+        <!--jwt工具-->
+        <auth0.version>3.2.0</auth0.version>
+        <!-- 第三方接口模块 -->
+        <external.version>1.0.2.jdk8</external.version>
+        <!--swagger2-->
+        <swagger2.version>2.9.2</swagger2.version>
+        <!--swagger2美化-->
+        <swagger2-bui.version>2.0.5</swagger2-bui.version>
+        <!--阿里json工具-->
+        <fastjson.version>1.2.73</fastjson.version>
+        <!--mybatis-plus-->
+        <mybatis-plus.version>3.3.2</mybatis-plus.version>
+        <!--mybatis plus 多数据源依赖-->
+        <dynamic-datasource.version>3.3.1</dynamic-datasource.version>
+        <!--mybatis-plus模板-->
+        <mybatis-plus-velocity.version>2.2</mybatis-plus-velocity.version>
+        <!--SQL打印分析-->
+        <p6spy.version>3.9.1</p6spy.version>
+        <!--阿里德鲁伊-->
+        <druid.version>1.1.22</druid.version>
+        <!--请求分析工具-->
+        <user-agent.version>1.20</user-agent.version>
+        <!--阿帕奇工具类-->
+        <apache-commons.version>2.6</apache-commons.version>
+        <!--反射工具-->
+        <reflections.version>0.9.11</reflections.version>
+        <!--Excel工具-->
+        <easypoi.vsrsion>4.1.0</easypoi.vsrsion>
+        <!--sql server连接驱动-->
+        <mssql-jdbc.version>8.4.0.jre8</mssql-jdbc.version>
+        <!--糊涂工具-->
+        <hutool.version>5.5.7</hutool.version>
+        <!--个推-->
+        <gexin.version>4.1.1.4</gexin.version>
+        <!-- 融云 -->
+        <rong.version>3.0.2</rong.version>
+        <!--拼音工具-->
+        <pinyin4j.version>2.5.0</pinyin4j.version>
+        <!--ssh2连接工具-->
+        <jcraft.version>0.1.55</jcraft.version>
+        <!-- 谷歌图片处理依赖 -->
+        <thumbnailator.version>0.4.8</thumbnailator.version>
+        <!-- 阿里云短信服务 -->
+        <alisdk.version>4.5.3</alisdk.version>
+        <!-- http工具包 -->
+        <httpcore.version>4.4.4</httpcore.version>
+        <httpclient.version>4.4.1</httpclient.version>
+        <!-- cxf工具包 -->
+        <cxf.version>3.3.4</cxf.version>
+        <!--配置读取工具-->
+        <configuration2.version>2.3</configuration2.version>
+        <!-- pdf 工具 -->
+        <pdfbox.version>2.0.24</pdfbox.version>
+        <tul-common.version>1.0.2.jdk8</tul-common.version>
+        <!-- 配置读取工具 -->
+        <commons-configuration.version>1.10</commons-configuration.version>
+    </properties>
+
+
+    <!--用于给子模块继承,使子模块不需要写 version -->
+    <dependencyManagement>
+        <dependencies>
+            <!--SpringBoot-->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--SpringCloud-->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--SpringCloud 阿里-->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- 反射工具 -->
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>${reflections.version}</version>
+            </dependency>
+            <!--jwt依赖-->
+            <dependency>
+                <groupId>com.auth0</groupId>
+                <artifactId>java-jwt</artifactId>
+                <version>${auth0.version}</version>
+            </dependency>
+            <!--swagger依赖-->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${swagger2.version}</version>
+            </dependency>
+            <!--swagger界面美化-->
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-spring-boot-starter</artifactId>
+                <version>${swagger2-bui.version}</version>
+            </dependency>
+            <!--swagger默认ui-->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>${swagger2.version}</version>
+                <scope>import</scope>
+            </dependency>
+            <!-- 阿里json依赖 -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+            <!-- mybatis-plus -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <!-- mybatis-plus 多数据源依赖 -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+                <version>${dynamic-datasource.version}</version>
+            </dependency>
+            <!-- mybatis-plus代码生成器 -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-generator</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <!-- mybatis-plus模板引擎 -->
+            <dependency>
+                <groupId>org.apache.velocity</groupId>
+                <artifactId>velocity-engine-core</artifactId>
+                <version>${mybatis-plus-velocity.version}</version>
+            </dependency>
+            <!-- sql server连接驱动 -->
+            <dependency>
+                <groupId>com.microsoft.sqlserver</groupId>
+                <artifactId>mssql-jdbc</artifactId>
+                <version>${mssql-jdbc.version}</version>
+            </dependency>
+            <!--第三方接口模块-->
+            <dependency>
+                <groupId>cn.tul.external</groupId>
+                <artifactId>ExternalApi</artifactId>
+                <version>${external.version}</version>
+            </dependency>
+            <!--配置读取工具-->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-configuration2</artifactId>
+                <version>${configuration2.version}</version>
+            </dependency>
+            <!--德鲁伊-->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+            <!-- sql 分析打印工具 -->
+            <dependency>
+                <groupId>p6spy</groupId>
+                <artifactId>p6spy</artifactId>
+                <version>${p6spy.version}</version>
+            </dependency>
+            <!--解析 User-Agent 字符串的 Java 类库-->
+            <dependency>
+                <groupId>eu.bitwalker</groupId>
+                <artifactId>UserAgentUtils</artifactId>
+                <version>${user-agent.version}</version>
+            </dependency>
+            <!--阿帕奇工具类-->
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>${apache-commons.version}</version>
+            </dependency>
+            <!-- Excel工具-->
+            <dependency>
+                <groupId>cn.afterturn</groupId>
+                <artifactId>easypoi-base</artifactId>
+                <version>${easypoi.vsrsion}</version>
+            </dependency>
+            <!-- Excel工具web依赖-->
+            <dependency>
+                <groupId>cn.afterturn</groupId>
+                <artifactId>easypoi-web</artifactId>
+                <version>${easypoi.vsrsion}</version>
+            </dependency>
+            <!--糊涂工具-->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+
+            <!-- 融云 -->
+            <dependency>
+                <groupId>cn.rongcloud.im</groupId>
+                <artifactId>server-sdk-java</artifactId>
+                <version>${rong.version}</version>
+            </dependency>
+            <!--拼音工具-->
+            <dependency>
+                <groupId>com.belerweb</groupId>
+                <artifactId>pinyin4j</artifactId>
+                <version>${pinyin4j.version}</version>
+            </dependency>
+            <!--ssh2连接工具-->
+            <dependency>
+                <groupId>com.jcraft</groupId>
+                <artifactId>jsch</artifactId>
+                <version>${jcraft.version}</version>
+            </dependency>
+            <!-- 谷歌图片处理依赖 -->
+            <dependency>
+                <groupId>net.coobird</groupId>
+                <artifactId>thumbnailator</artifactId>
+                <version>${thumbnailator.version}</version>
+            </dependency>
+            <!-- 阿里云短信服务 -->
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>aliyun-java-sdk-core</artifactId>
+                <version>${alisdk.version}</version>
+            </dependency>
+            <!-- http工具包 -->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>${httpcore.version}</version>
+            </dependency>
+            <!-- http工具包 -->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpclient.version}</version>
+            </dependency>
+            <!-- cxf -->
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-frontend-jaxws</artifactId>
+                <version>${cxf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-transports-http</artifactId>
+                <version>${cxf.version}</version>
+            </dependency>
+            <!--PDF工具-->
+            <dependency>
+                <groupId>org.apache.pdfbox</groupId>
+                <artifactId>pdfbox</artifactId>
+                <version>${pdfbox.version}</version>
+            </dependency>
+            <!--配置读取工具-->
+            <dependency>
+                <groupId>commons-configuration</groupId>
+                <artifactId>commons-configuration</artifactId>
+                <version>${commons-configuration.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
+</project>

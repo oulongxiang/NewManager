@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tul.manage.security.dao.ElementDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tul.manage.security.entity.Element">
+        <id column="id" property="id" />
+        <result column="element_code" property="elementCode" />
+        <result column="element_name" property="elementName" />
+        <result column="element_icon" property="elementIcon" />
+        <result column="api_uri" property="apiUri" />
+        <result column="description" property="description" />
+        <result column="deleted" property="deleted" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, element_code, element_name, element_icon, api_uri, description, deleted, create_time, update_time
+    </sql>
+
+    <select id="getUserElement" resultType="java.util.Map">
+        <if test="userId!=null">
+            select element_code as elementCode,element_name as elementName,
+            menu_name as menuName ,h.menu_id as menuId,h.element_id as elementId from user_info a
+            join user_role b on a.id=b.user_id
+            join role c on c.id=b.role_id
+            join role_permission d on d.role_id=c.id
+            join permission e on e.id=d.permission_id
+            join element_permission f on f.permission_id=e.id
+            join element g on g.id=f.element_id
+            join menu_element h on h.element_id=g.id
+            join menu i on i.id=h.menu_id
+            where a.id=#{userId}
+            and a.deleted=0
+            and b.deleted=0
+            and c.deleted=0
+            and d.deleted=0
+            and e.deleted=0
+            and f.deleted=0
+            and g.deleted=0
+            and h.deleted=0
+            and i.deleted=0
+        </if>
+        <if test="userId==null">
+            select element_code as elementCode,element_name as elementName,
+            menu_name as menuName ,b.menu_id as menuId,b.element_id as elementId
+            from element a
+            join menu_element b on b.element_id=a.id
+            join menu c on c.id=b.menu_id
+            where
+            a.deleted=0
+            and b.deleted=0
+            and c.deleted=0
+        </if>
+    </select>
+
+    <select id="getElementToMenuId" resultType="com.tul.manage.security.entity.Element">
+        select a.* from element a join menu_element b on a.id=b.element_id where b.menu_id=#{menuId} and a.deleted=0 and b.deleted=0
+    </select>
+
+    <select id="getElementListToRoleId" resultType="java.util.Map">
+        select element_code as elementCode,element_name as elementName,
+            menu_name as menuName ,g.id as menuId,e.id as elementId
+			from role a
+            join role_permission b on b.role_id=a.id
+            join permission c on c.id=b.permission_id
+            join element_permission d on d.permission_id=c.id
+            join element e on e.id=d.element_id
+            join menu_element f on f.element_id=e.id
+            join menu g on g.id=f.menu_id
+            where  a.id=#{roleId}
+			and a.deleted=0
+            and b.deleted=0
+            and c.deleted=0
+            and d.deleted=0
+            and e.deleted=0
+            and f.deleted=0
+            and g.deleted=0
+    </select>
+    <select id="isRepeat" resultType="java.lang.Boolean">
+        select count(*) from
+        element a
+        join menu_element b on a.id=b.element_id
+        join menu c on c.id=b.menu_id
+        where a.deleted=0 and b.deleted=0 and c.deleted=0
+        and c.id=#{menuId} and a.element_code=#{elementCode}
+    </select>
+    <select id="getElementAllListToRoleId" resultType="java.util.Map">
+         select distinct
+            element_code as elementCode,element_name as elementName,b.menu_id as menuId,a.id as elementId
+            from
+                element a
+                join menu_element b on a.id =b.element_id
+                where b.menu_id in (
+                select distinct a.id from
+                menu a
+                join menu_element b on a.id =b.menu_id
+                join menu_permission c on c.menu_id=a.id
+                join permission d on d.id=c.permission_id
+                join role_permission e on e.permission_id=d.id
+                join role f on f.id=e.role_id
+                where f.id=#{roleId}
+                and a.deleted=0
+                and b.deleted=0
+                and c.deleted=0
+                and d.deleted=0
+                and e.deleted=0)
+                and a.deleted=0
+                and b.deleted=0
+    </select>
+
+</mapper>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tul.manage.security.dao.MenuDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tul.manage.security.entity.Menu">
+        <id column="id" property="id" />
+        <result column="menu_type" property="menuType" />
+        <result column="menu_parent_id" property="menuParentId" />
+        <result column="menu_name" property="menuName" />
+        <result column="menu_path" property="menuPath" />
+        <result column="menu_url" property="menuUrl" />
+        <result column="icon" property="icon" />
+        <result column="description" property="description" />
+        <result column="sort" property="sort" />
+        <result column="deleted" property="deleted" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, menu_type,menu_parent_id, menu_name, menu_path, menu_url, icon, description, sort, deleted, create_time, update_time
+    </sql>
+    <select id="getMenuList" resultType="com.tul.manage.security.entity.Menu">
+        <if test="userId == null">
+            select * from menu where deleted=0
+            <if test="menuType !=null">  and menu_type=#{menuType}</if>
+            order by menu_parent_id,sort ASC
+        </if>
+        <if test="userId != null">
+            select * from(
+            select distinct a.* from
+            menu a
+            join menu_permission c on c.menu_id=a.id
+            join permission d on d.id=c.permission_id
+            join role_permission e on e.permission_id=d.id
+            join role f on f.id=e.role_id
+            join user_role g on g.role_id=f.id
+            join user_info h on h.id=g.user_id
+            where h.id=#{userId}
+            and a.deleted=0
+            and c.deleted=0
+            and d.deleted=0
+            and e.deleted=0
+            and f.deleted=0
+            and g.deleted=0
+            and h.deleted=0
+            <if test="menuType !=null">  and a.menu_type=#{menuType}</if>
+            union all
+            select * from menu where id in (
+            select distinct a.menu_parent_id from
+            menu a
+            join menu_permission c on c.menu_id=a.id
+            join permission d on d.id=c.permission_id
+            join role_permission e on e.permission_id=d.id
+            join role f on f.id=e.role_id
+            join user_role g on g.role_id=f.id
+            join user_info h on h.id=g.user_id
+            where h.id=#{userId}
+            and a.deleted=0
+            and c.deleted=0
+            and d.deleted=0
+            and e.deleted=0
+            <if test="menuType !=null">  and a.menu_type=#{menuType}</if>
+            )) a order by menu_parent_id,sort ASC
+        </if>
+    </select>
+    <select id="getMenuListToRoleId" resultType="com.tul.manage.security.entity.Menu">
+        select * from(
+        select distinct a.* from
+        menu a
+        join menu_permission b on a.id =b.menu_id
+        join permission c on c.id=b.permission_id
+        join role_permission d on d.permission_id=c.id
+        join role e on e.id=d.role_id
+        where e.id=#{roleId}
+        and a.deleted=0
+        and b.deleted=0
+        and c.deleted=0
+        and d.deleted=0
+        and e.deleted=0
+      union all
+      select * from menu where id in (
+      select distinct a.menu_parent_id from
+        menu a
+        join menu_permission b on a.id =b.menu_id
+        join permission c on c.id=b.permission_id
+        join role_permission d on d.permission_id=c.id
+        join role e on e.id=d.role_id
+        where e.id=#{roleId}
+        and a.deleted=0
+        and b.deleted=0
+        and c.deleted=0
+        and d.deleted=0
+        and e.deleted=0
+      )) a order by menu_parent_id,sort ASC
+    </select>
+
+</mapper>

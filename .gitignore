@@ -1,0 +1,15 @@
+.logs
+.idea
+target
+/CommonEntity/target
+/Generator/target
+/Security/target
+/Warning/target
+/AuditSystem.iml
+/Common/Common.iml
+/BaseModel/*.iml
+/CommonEntity/CommonEntity.iml
+/Generator/Generator.iml
+/Quartz/Quartz.iml
+/Security/Security.iml
+/Warning/Warning.iml

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tul.manage.security.dao.UserInfoDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tul.manage.security.entity.UserInfo">
+        <id column="id" property="id" />
+        <result column="account_number" property="accountNumber" />
+        <result column="login_password" property="loginPassword" />
+        <result column="org_id" property="orgId" />
+        <result column="emp_code" property="empCode" />
+        <result column="emp_id" property="empId" />
+        <result column="leader_emp_id" property="leaderEmpId" />
+        <result column="emp_id_hierarchy" property="empIdHierarchy" />
+        <result column="post_id" property="postId" />
+        <result column="id_card" property="idCard" />
+        <result column="user_name" property="userName" />
+        <result column="gender" property="gender" />
+        <result column="mobile" property="mobile" />
+        <result column="email" property="email" />
+        <result column="is_lock" property="isLock" />
+        <result column="sso_code" property="ssoCode" />
+        <result column="login_time" property="loginTime" />
+        <result column="login_count" property="loginCount" />
+        <result column="deleted" property="deleted" />
+        <result column="create_user_id" property="createUserId" />
+        <result column="update_user_id" property="updateUserId" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, account_number, login_password, org_id, emp_code, emp_id, leader_emp_id,emp_id_hierarchy, post_id, id_card, user_name, gender, mobile, email, is_lock, sso_code, login_time, login_count, deleted,create_user_id,update_user_id, create_time, update_time
+    </sql>
+    <select id="getUserRole" resultType="java.util.Map">
+          select distinct b.user_id as userId,a.role_name as roleName from role a join user_role b on a.id=b.role_id
+        where a.deleted=0 and b.deleted=0
+    </select>
+
+    <select id="getUserInfoList" resultType="com.tul.manage.security.vo.response.UserInfoVo">
+        select a.id as user_id, a.emp_code,a.user_name,b.org_id, b.org_name,a.gender,a.mobile,c.post_name,a.id_card,a.post_id ,a.leader_emp_id   as leaderEmpId,a.emp_id,a.is_lock,a.login_count,a.login_password,a.email,a.id
+        from user_info a
+        left join organization b on a.org_id=b.org_id
+        left join position c on a.post_id=c.post_id
+        left  join user_info info on a.leader_emp_id=info.emp_id
+        where
+        a.deleted=0
+        <if test="queryParam.empCode!=null">and a.emp_code like CONCAT('%',#{queryParam.empCode},'%')</if>
+        <if test="queryParam.userName!=null">and a.user_name like CONCAT('%',#{queryParam.userName},'%')</if>
+        <if test="queryParam.gender!=null">and a.gender=#{queryParam.gender}</if>
+        <if test="queryParam.mobile!=null">and a.mobile like CONCAT('%',#{queryParam.mobile},'%')</if>
+        <if test="queryParam.orgName!=null">and a.org_id=#{queryParam.orgName}</if>
+        <if test="queryParam.territory!=null">
+            and a.id in (
+            select user_id from territory where deleted=0 and org_id in
+            <foreach collection="queryParam.territory" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="queryParam.roleNameList !=null and queryParam.roleNameList.size()>0 ">
+         and a.id in (select distinct id from user_info where id in
+         ( select distinct user_id from user_role
+         where role_id in
+            <foreach collection="queryParam.roleNameList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+            group by user_id having count(user_id)=${queryParam.roleNameList.size} ))
+        </if>
+    </select>
+
+    <select id="getUserListToRole" resultType="com.tul.manage.security.vo.response.UserInfoVo">
+       select a.emp_code,a.id as user_id,a.user_name,a.id_card,a.org_id,d.org_name,a.gender,a.mobile,e.post_name
+        from
+        user_info a
+        join user_role b on a.id=b.user_id
+        join role c on c.id=b.role_id
+        left join organization d on d.org_id=a.org_id
+		left join position e on e.post_id=a.post_id
+        where a.deleted=0 and b.deleted=0 and c.deleted=0 and c.id=#{roleId}
+    </select>
+
+    <select id="getOrgUser" resultType="com.tul.manage.security.vo.request.OrgUserTreeVo">
+        select a.user_name, a.id as user_id,b.org_id,b.org_name,b.parent_org_id from user_info a right join organization b on a.org_id=b.org_id
+        order by org_id
+    </select>
+
+    <select id="getUserInfoVoToAccount" resultType="com.tul.manage.security.vo.response.UserInfoVo">
+          select a.* , b.org_name,c.post_name
+        from user_info a
+        left join organization b on a.org_id=b.org_id
+        left join position c on a.post_id=c.post_id
+        where
+        a.deleted=0 and a.account_number=#{accountNumber}
+    </select>
+
+    <select id="getUserInfoVoToSsoCode" resultType="com.tul.manage.security.vo.response.UserInfoVo">
+          select a.* , b.org_name,c.post_name
+        from user_info a
+        left join organization b on a.org_id=b.org_id
+        left join position c on a.post_id=c.post_id
+        where
+        a.deleted=0 and a.sso_code=#{ssoCode}
+    </select>
+
+    <select id="getSubordinateUserList" resultType="com.tul.manage.security.entity.UserInfo">
+        SELECT
+        <include refid="Base_Column_List"></include>
+        FROM
+        user_info CROSS APPLY STRING_SPLIT(emp_id_hierarchy, ',')
+        where value=#{empId} and emp_id !=#{empId} and deleted=0
+    </select>
+
+    <select id="getUserLeaderId" resultMap="BaseResultMap">
+        select b.ID
+        FROM user_info a
+        join user_info b on a.leader_emp_id  = b.emp_id
+        where a.id = #{userId}
+    </select>
+</mapper>

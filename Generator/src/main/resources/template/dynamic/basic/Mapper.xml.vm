@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="${package}.${moduleName}.dao.${className}Dao">
+  <!-- 通用查询映射结果 -->
+  <resultMap id="${classname}Map" type="${package}.${moduleName}.entity.${className}">
+#foreach($column in $columns)
+#if($column.lowerAttrName==$pk.lowerAttrName)
+    <id property="${pk.lowerAttrName}" column="${pk.columnName}"/>
+#else
+    <result property="${column.lowerAttrName}" column="${column.columnName}"/>
+#end
+#end
+  </resultMap>
+
+  <!-- 通用查询结果列 -->
+  <sql id="Base_Column_List">
+#foreach($field in $columns )
+      ${field.columnName}#if($foreach.hasNext),#end
+#end
+  </sql>
+
+
+</mapper>

@@ -1,0 +1,67 @@
+spring:
+  profiles:
+    active: prod #dev 本地 #test 测试 #prod 线上
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  quartz:
+    # 将任务等保存化到数据库
+    job-store-type: jdbc
+    # 程序结束时会等待quartz相关的内容结束
+    wait-for-jobs-to-complete-on-shutdown: true
+    # QuartzScheduler启动时更新己存在的Job,这样就不用每次修改targetObject后删除 qrtz_job_details表对应记录
+    overwrite-existing-jobs: true
+    # 其他配置
+    properties:
+      org:
+        quartz:
+          # scheduler相关
+          scheduler:
+            # scheduler的实例名
+            instanceName: scheduler
+            instanceId: AUTO
+          # 持久化相关
+          jobStore:
+            isClustered: false
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            selectWithLockSQL: SELECT* FROM {0}LOCKS UPDLOCK WHERE LOCK_NAME = ?
+            # 表示数据库中相关表是QRTZ_开头的
+            tablePrefix: QRTZ_
+            useProperties: false
+          # 线程池相关
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            # 线程数
+            threadCount: 10
+            # 线程优先级
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
+
+
+## 服务器 配置
+server:
+  port: 8972 #端口号
+  servlet:
+    context-path: /AuditSystem #设置通过 http://ip:port/AuditSystem/ 来访问项目
+
+## 枚举包扫描
+mybatis-plus:
+  typeEnumsPackage: com.tul.manage.*.enums
+  type-handlers-package: com.tul.manage.handler
+
+## 日志级别
+logging:
+  level:
+    root: debug
+## 系统信息
+project:
+  describe:
+    name: 审计系统
+  jwt:
+    EXPIRE_TIME: 3         #Token过期时间,按小时算
+    LONG_EXPIRE_TIME: 6    #长Token过期时间,按小时算
+    SECRET: 1231dasdb      #Token加密密钥
+    LONG_SECRET: 2341fbeqr #长Token加密密钥
+    ISSUER: zengyu         #Token发布人

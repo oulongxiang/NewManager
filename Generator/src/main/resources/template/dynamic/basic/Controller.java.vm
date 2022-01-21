@@ -1,0 +1,20 @@
+package ${package}.${moduleName}.controller;
+
+import apps.commons.base.BaseController;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.*;
+
+
+/**
+ * ${comments}
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@RestController
+@RequestMapping("/admin/${pathName}" )
+@Api(value = "${pathName}接口", tags = "${comments}接口")
+public class ${className}Controller extends BaseController{
+
+}

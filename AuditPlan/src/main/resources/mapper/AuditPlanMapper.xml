@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tul.manage.plan.dao.AuditPlanDao">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="auditPlanMap" type="com.tul.manage.plan.entity.AuditPlan">
+        <id property="id" column="id"/>
+        <result property="planType" column="plan_type"/>
+        <result property="projectName" column="project_name"/>
+        <result property="projectType" column="project_type"/>
+        <result property="projectAffiliation" column="project_affiliation"/>
+        <result property="projectCooperation" column="project_cooperation"/>
+        <result property="projectSecret" column="project_secret"/>
+        <result property="auditUserId" column="audit_user_id"/>
+        <result property="auditClue" column="audit_clue"/>
+        <result property="auditGoal" column="audit_goal"/>
+        <result property="auditScope" column="audit_scope"/>
+        <result property="auditWay" column="audit_way"/>
+        <result property="auditBeginDate" column="audit_begin_date"/>
+        <result property="auditEndDate" column="audit_end_date"/>
+        <result property="remark" column="remark"/>
+        <result property="createUserId" column="create_user_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="isDeleted" column="is_deleted"/>
+        <result property="status" column="status"/>
+        <result property="abandonedReason" column="abandoned_reason"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+      id,
+      plan_type,
+      project_name,
+      project_type,
+      project_affiliation,
+      project_cooperation,
+      project_secret,
+      audit_user_id,
+      audit_clue,
+      audit_goal,
+      audit_scope,
+      audit_way,
+      audit_begin_date,
+      audit_end_date,
+      remark,
+      create_user_id,
+      create_time,
+      is_deleted,
+      status,
+      abandoned_reason
+  </sql>
+    <select id="getAuditPlanInfoPageList" resultType="com.tul.manage.plan.entity.AuditPlan">
+        select ap.plan_type,
+			ap.status,
+			ap.project_name,
+			ui.user_name as governorName,
+			apm.user_id as projectMemberName,
+			ap.audit_end_date
+	    from audit_plan ap
+	    left join user_info ui on ap.audit_user_id=ui.id
+	    left join audit_project_member apm on ap.id=apm.plan_id and apm.is_deleted=0
+    </select>
+
+
+</mapper>

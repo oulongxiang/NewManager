@@ -1,0 +1,21 @@
+package ${package.ServiceImpl};
+
+import ${package.Entity}.${entity};
+import ${package.Mapper}.${table.mapperName};
+import ${package.Service}.${table.serviceName};
+import com.baomidou.dynamic.datasource.annotation.DS;
+import org.springframework.stereotype.Service;
+import com.tul.manage.agenterp.service.AgentErpBaseServiceImpl;
+/**
+ * <p>
+ * $!{table.comment} 服务实现类
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+@Service
+@DS("Admin")
+public class ${table.serviceImplName} extends AgentErpBaseServiceImpl<${table.mapperName}, ${entity}> implements ${table.serviceName} {
+
+}

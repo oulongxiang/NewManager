@@ -1,0 +1,48 @@
+package ${package}.${moduleName}.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.tul.manage.security.service.BaseServiceImpl;
+import apps.commons.util.page.PageFactory;
+import apps.commons.util.page.PageInfo;
+import apps.commons.util.tool_util.VerifyParams;
+import org.springframework.stereotype.Service;
+import ${package}.${moduleName}.entity.${className};
+import ${package}.${moduleName}.dao.${className}Dao;
+import ${package}.${moduleName}.service.I${className}Service;
+#if($dataSourceName)
+import com.baomidou.dynamic.datasource.annotation.DS;
+#end
+/**
+ * ${comments} 业务层实现类
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Service
+#if($dataSourceName)
+@DS("$dataSourceName")
+#end
+public class ${className}ServiceImpl extends BaseServiceImpl<${className}Dao, ${className}> implements I${className}Service {
+
+    @Override
+    public PageInfo<${className}> query${className}(){
+        return new PageInfo<>(page(PageFactory.getDefaultPage(),new QueryWrapper<>()));
+    }
+
+    @Override
+    public void addOrUpdate${className}(${className} data){
+        //这里先校验参数
+        //例如 ： VerifyParams.throwEmpty(data,"获取数据失败!");
+        saveOrUpdate(data);
+    }
+
+    #if(${pk.attrType})
+    @Override
+    public void delete${className}(${pk.attrType} id){
+        VerifyParams.throwEmpty(id,"获取id失败!");
+        removeById(id);
+    }
+    #end
+
+
+}

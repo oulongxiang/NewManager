@@ -1,0 +1,37 @@
+package ${package}.${moduleName}.service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import apps.commons.util.page.PageInfo;
+import ${package}.${moduleName}.entity.${className};
+
+/**
+ * ${comments} 业务层接口
+ *
+ * @author ${author}
+ * @date ${datetime}
+ */
+public interface I${className}Service extends IService<${className}> {
+
+    /**
+    * 分页查询
+    *
+    * @return ${comments}分页查询结果
+    */
+    PageInfo<${className}> query${className}();
+
+    /**
+     * 新增或修改数据
+     * @param data 所需数据 主键为空时为新增 主键不为空时为修改
+     */
+    void addOrUpdate${className}(${className} data);
+
+    #if(${pk.attrType})
+     /**
+     * 根据id删除数据
+     * @param id id主键
+     */
+     void delete${className}(${pk.attrType} id);
+    #end
+
+
+}

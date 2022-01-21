@@ -1,0 +1,189 @@
+<template>
+    <basic-container>
+        <avue-crud ref="crud"
+                   :page.sync="page"
+                   :data="data"
+                   :permission="permissionList"
+                   :table-loading="loading"
+                   :option="option"
+                   @on-load="query()"
+                   @search-change="searchChange"
+                   @refresh-change="query()"
+                   @size-change="sizeChange"
+                   @current-change="currentChange"
+                   @row-update="update"
+                   @row-save="save"
+                   @row-del="del">
+        </avue-crud>
+    </basic-container>
+</template>
+
+<script>
+export default {
+    data() {
+        return {
+            //表格相关参数
+            page: {},         //分页配置 【默认 第1页 每页10条数据】
+            sort:{},          //排序配置 【默认 无排序】
+            data:[],          //请求获取后的数据/表格数据
+            queryParams:{},   //用于保存查询条件
+            loading:false,    //表格数据是否加载中
+            //表格配置
+            option:{
+                index:true,         //是否显示首行序号
+                indexLabel:'序号',
+                border:true,        //表格显示边框
+                stripe:true,        //表格显示斑马纹
+                searchMenuSpan: 6,  //设置搜索按钮栅栏
+                column: [
+                #foreach ($column in $columns)
+        ## 当列是主键 新增不显示，编辑的时候显示单不能编辑
+            #if($column.columnName == $pk.columnName || $excludeColumns.contains($column.columnName))
+                  {
+                            type: "input",
+                            label: "$column.comments",
+                            prop: "$column.lowerAttrName",
+                            addDisplay: false,
+                            editDisabled: true
+                          }#if($foreach.hasNext),#end
+            #else
+                  {
+                            type: "input",
+                            label: "$column.comments",
+                            prop: "$column.lowerAttrName",
+                            search:true,
+                          }#if($foreach.hasNext),#end
+            #end
+#end
+                        ]
+            }
+        }
+    },
+    computed: {
+        //权限
+        permissionList() {
+            // return {
+            //   addBtn: this.$utils.hasPermission (this.$route,'addBtn'),
+            //   delBtn: this.$utils.hasPermission (this.$route,'delBtn'),
+            //   editBtn: this.$utils.hasPermission (this.$route,'editBtn')
+            // };
+            return {
+                addBtn: true,
+                delBtn: true,
+                editBtn: true
+            };
+        }
+    },
+    methods: {
+        /**
+         * 查询数据 默认注释了，请自行打开
+         * @param params 查询条件 (可选)
+         * @param done   控制搜索转圈（可选）
+         */
+        query(params, done){
+            // //设置表格加载中
+            // this.loading=true
+            // //将条件，分页，排序拼接起来用作发给后端的参数
+            // this.queryParams = params
+            // let queryData=this.$utils.getQueryParam (this.queryParams,this.page,this.sort)
+            // //向后端发起请求，获取数据
+            // query(queryData).then(res=>{
+            //   //请求数据成功,设置表格数据和分页
+            //   this.data=res.data
+            //   //设置分页信息
+            //   this.page.total = res.page.total
+            //   //一般只有点击搜索时会传入改参数,用于禁用搜索菜单
+            //   if (done){
+            //     //取消禁用搜索菜单
+            //     done();
+            //   }
+            // }).finally(()=>{
+            //   //不管失败还是成功，都把表格设置为加载完毕
+            //   this.loading=false
+            // })
+        },
+        /**
+         * 点击表单保存按钮
+         * @param form 表单数据
+         * @param done 调用关闭表单
+         * @param loading 调用取消表单不可编辑状态
+         */
+        save(form, done,loading) {
+            save(form).then(res=>{
+                done();
+                this.$message.success (res.message)
+                this.query(this.queryParams)
+            }).finally(()=>{loading();})
+        },
+        /**
+         * 点击表单的修改确认按钮
+         * @param form 表单数据
+         * @param index 数据索引
+         * @param done 调用关闭表单
+         * @param loading 调用取消表单不可编辑状态
+         */
+        update(form, index, done,loading) {
+            update(form).then(res=>{
+                done();
+                this.$message.success (res.message)
+                this.query(this.queryParams)
+            }).finally(()=>{loading();})
+        },
+        /**
+         * 删除数据
+         * @param row 删除行数据
+         * @index  删除行索引
+         */
+        del(row, index) {
+            this.$confirm("确认删除数据【"+row.$pk.lowerAttrName+"】？").then(()=>{
+                this.loading=true
+                del(row.timerId).then(res=>{
+                    this.$message.success (res.message)
+                    this.query(this.queryParams)
+                }).finally(()=>{this.loading=false})
+            })
+        },
+        /**
+         * 点击搜索后触发
+         * @param params 搜索的参数
+         * @param done   控制搜索转圈
+         */
+        searchChange(params, done) {
+            //点击查询后需要将当前页数设置为1
+            this.page.currentPage = 1
+            //调用查询方法
+            this.query(params, done)
+        },
+        /** 页数变更后触发
+         * @param val 变更的页数
+         */
+        currentChange(val) {
+            //设置当前页数
+            this.page.currentPage = val
+            //重新执行查询
+            this.query(this.queryParams)
+        },
+        /** 每页数据个数变更后触发
+         * @param val 变更的每页数据个数
+         */
+        sizeChange(val) {
+            //设置当前页数为1
+            this.page.currentPage = 1
+            //设置每页个数
+            this.page.pageSize = val
+            //重新执行查询
+            this.query(this.queryParams)
+        },
+        /**
+         * 点击某个字段排序后触发 设置前端排序与后端排序一致
+         * @param val 排序的字段等信息
+         */
+        sortChange(val){
+            //封装成后端可用的排序参数
+            this.sort=this.$utils.getSortParam (val,this.option)
+            this.query(this.queryParams)
+        },
+    },
+    mounted(){ this.$utils.resetHeight (0,this.option) }
+}
+</script>

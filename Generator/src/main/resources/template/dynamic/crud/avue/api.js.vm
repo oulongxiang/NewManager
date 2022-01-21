@@ -1,0 +1,31 @@
+import request from '@/router/axios';
+import { baseUrl } from '@/config/env';
+
+/**
+ * 分页查询
+ * @param params 查询+排序+分页
+ */
+export const query${className} = (params) => request({
+    url: baseUrl + '/${pathName}/query${className}',
+    params:params,
+    method: 'get'
+})
+
+/**
+ * 新增或修改数据
+ * @param data 所需数据
+ */
+export const addOrUpdate${className} = (data) => request({
+    url: baseUrl + '/${pathName}/addOrUpdate${className}',
+    data: data,
+    method: 'post'
+})
+
+#if(${pk.attrType})
+export const delete${className} =(id) => request({
+    url: baseUrl + '/${pathName}/delete${className}',
+    params:{id:id},
+    method: 'delete'
+})
+#end
+

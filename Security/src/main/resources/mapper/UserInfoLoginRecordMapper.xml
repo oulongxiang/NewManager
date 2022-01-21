@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tul.manage.security.dao.UserInfoLoginRecordDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tul.manage.security.entity.UserInfoLoginRecord">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="login_type" property="loginType" />
+        <result column="browser" property="browser" />
+        <result column="operating_system" property="operatingSystem" />
+        <result column="ip_address" property="ipAddress" />
+        <result column="create_time" property="createTime" />
+        <result column="deleted" property="deleted" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_id, login_type, browser, operating_system, ip_address, create_time, deleted
+    </sql>
+    <select id="getLoginLogList" resultType="com.tul.manage.security.vo.response.LoginLogVo">
+        select
+        a.user_name,
+        b.login_type,
+        b.browser,
+        b.operating_system,
+        b.ip_address,
+        b.create_time
+        from
+        user_info a
+        join user_info_login_record b on a.id=b.user_id
+        where a.deleted=0
+        <if test="queryParams.userId != null and queryParams.userId != ''">
+            and a.id=#{queryParams.userId}
+        </if>
+        <if test="queryParams.userName != null and queryParams.userName != ''">
+            and a.user_name like CONCAT('%',#{queryParams.userName},'%')
+        </if>
+        <if test="queryParams.beginLoginDate != null and queryParams.endLoginDate != null">
+            and CONVERT(varchar(100),b.create_time, 23)  between #{queryParams.beginLoginDate} and #{queryParams.endLoginDate}
+        </if>
+        <if test="queryParams.loginType != null and queryParams.loginType != ''">
+            and b.login_type=#{queryParams.loginType}
+        </if>
+
+    </select>
+
+</mapper>

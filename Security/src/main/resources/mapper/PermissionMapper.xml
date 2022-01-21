@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tul.manage.security.dao.PermissionDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tul.manage.security.entity.Permission">
+        <id column="id" property="id" />
+        <result column="description" property="description" />
+        <result column="deleted" property="deleted" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, description, deleted, create_time, update_time
+    </sql>
+    <select id="getUserAllApiPermission" resultType="java.lang.String">
+        <if test="accountNumber != null">
+            select api_uri from user_info a
+            join user_role b on a.id=b.user_id
+            join role c on c.id=b.role_id
+            join role_permission d on d.role_id=c.id
+            join permission e on e.id=d.permission_id
+            join element_permission f on f.permission_id=e.id
+            join element g on g.id=f.element_id
+            where a.id=#{userId} and api_uri is not null
+            and a.deleted=0
+            and b.deleted=0
+            and c.deleted=0
+            and d.deleted=0
+            and e.deleted=0
+            and f.deleted=0
+            and g.deleted=0
+        </if>
+        <if test="accountNumber == null">
+            select api_uri from element where api_uri is not null and deleted=0
+        </if>
+    </select>
+    <select id="hasPermissionToRoleMenu" resultType="java.lang.Boolean">
+         select count(*) from menu a
+            join menu_permission b on b.menu_id=a.id
+            join permission c on c.id=b.permission_id
+            join role_permission d on d.permission_id=c.id
+            join role e on e.id=d.role_id
+            where
+            a.deleted=0
+            and b.deleted=0
+            and c.deleted=0
+            and d.deleted=0
+            and e.deleted=0
+            and e.id=#{roleId} and a.id=#{menuId}
+    </select>
+
+</mapper>
