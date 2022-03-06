@@ -22,7 +22,7 @@ import java.util.Map;
  * @since 2021-05-27
  */
 @Mapper
-@DS("Admin")
+@DS("admin")
 public interface UserInfoDao extends BaseMapper<UserInfo> {
 
     /**

@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: prod #dev 本地 #test 测试 #prod 线上
+    active: dev #dev 本地 #test 测试 #prod 线上
   servlet:
     multipart:
       max-file-size: 100MB

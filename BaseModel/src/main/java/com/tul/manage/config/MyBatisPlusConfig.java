@@ -38,16 +38,10 @@ public class MyBatisPlusConfig implements MetaObjectHandler {
     @Bean
     public PaginationInterceptor paginationInterceptor() {
         PaginationInterceptor paginationInterceptor = new PaginationInterceptor();
-        paginationInterceptor.setCountSqlParser(new JsqlParserCountOptimize(true));
-        // 创建SQL解析器集合
-        List<ISqlParser> sqlParserList = new ArrayList<>();
-        // 动态表名SQL解析器
-        DynamicTableNameParser dynamicTableNameParser = new DynamicTableNameParser();
-        Map<String, ITableNameHandler> tableNameHandlerMap = MapUtil.newHashMap();
-
-        dynamicTableNameParser.setTableNameHandlerMap(tableNameHandlerMap);
-        sqlParserList.add(dynamicTableNameParser);
-        paginationInterceptor.setSqlParserList(sqlParserList);
+        //設置請求的頁面大於最大頁後操作，true調回到首頁，false繼續請求，default為false
+        paginationInterceptor.setOverflow(true);
+        //最大單頁限制數量，default為500，-1表示不受限制
+        paginationInterceptor.setLimit(1000);
         return paginationInterceptor;
     }
 
